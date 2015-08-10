@@ -1,0 +1,15 @@
+{% extends "base.html.twig" %}
+
+{% block content %}
+	
+	<div class="page-register container content clearfix">
+		<div class="wrapper">
+			<span class="caption">Please, enter following data to register:</span>
+			{{ form_start(form) }}
+				{{ form_widget(form) }}
+				<button type="submit" class="right btn submit-btn">Register</button>
+			{{ form_end(form) }}
+		</div>
+	</div>
+
+{% endblock %}

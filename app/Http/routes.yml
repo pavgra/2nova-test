@@ -2,3 +2,19 @@ index:
     path: /
     defaults: { _controller: 'PageController@index' }
     methods: ['GET']
+register:
+    path: /register
+    defaults: {_controller: 'PageController@register' }
+    methods: ['GET', 'POST']
+afterReg:
+    path: /afterReg
+    defaults: {_controller: 'PageController@afterReg' }
+    methods: ['GET']
+login:
+    path: /login
+    defaults: {_controller: 'PageController@login' }
+    methods: ['GET', 'POST']
+logout:
+    path: /logout
+    defaults: {_controller: 'PageController@logout' }
+    methods: ['GET']

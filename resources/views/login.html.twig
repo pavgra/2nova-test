@@ -1,0 +1,15 @@
+{% extends "base.html.twig" %}
+
+{% block content %}
+	
+	<div class="page-login container content clearfix">
+		<div class="wrapper">
+			<span class="caption">Please, enter your credentials to enter:</span>
+			{{ form_start(form) }}
+				{{ form_widget(form) }}
+				<button type="submit" class="right btn submit-btn">Log in</button>
+			{{ form_end(form) }}
+		</div>
+	</div>
+
+{% endblock %}

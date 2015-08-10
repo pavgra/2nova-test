@@ -1,0 +1,30 @@
+@red: #b71c1c;
+
+@import "blocks/footer.less";
+@import "pages/index.less";
+@import "pages/login-register.less";
+
+.container.content {
+	margin: 40px auto;
+}
+
+.clearfix:after { 
+   content: " ";
+   display: block; 
+   height: 0; 
+   clear: both;
+}
+
+.alert, .help-block {
+	color: @red;
+}
+
+.caption {
+	font-size: 1.4rem;
+	font-weight: 300;
+	color: #9e9e9e;
+}
+
+.collection-item.active .secondary-content {
+	color: white;
+}

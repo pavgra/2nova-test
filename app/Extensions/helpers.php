@@ -5,18 +5,14 @@ function nvl($arr, $key, $default = null) {
 }
 
 function base_path($path = "") {
-	return $_SERVER["DOCUMENT_ROOT"] . "/../" . $path;
+	return __DIR__ . "/../../" . $path; //TODO
 }
 
 function config($dotPath) {
-	$config = null;
-	
 	$path = explode(".", $dotPath);
 	$cnt = count($path);
 
-	if ($cnt > 0) {
-		$config = include base_path("config/{$path[0]}.php");	
-	}
+	$config = include base_path("config/{$path[0]}.php");
 
 	if (isset($config) && is_array($config)) {
 		for ($i=1; $i < $cnt; $i++) {		
@@ -25,8 +21,4 @@ function config($dotPath) {
 	}
 
 	return $config;
-}
-
-function view($path, $params) {
-	return \App\Extensions\View::make($path, $params);
 }
