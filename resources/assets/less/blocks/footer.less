@@ -1,0 +1,22 @@
+.page-footer {
+	ul {
+		list-style: none;
+		display: flex;
+		justify-content: space-between;
+		li {
+			display: inline-block;
+			&:last-of-type {
+				padding-right: 15px;
+			}
+			.fa {
+				padding-right: 5px;
+			}
+		}
+	}
+
+	@media(min-width: 1200px) {
+		position: fixed;
+		bottom: 0;
+		width: 100%;
+	}
+}

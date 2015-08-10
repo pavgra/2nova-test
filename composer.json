@@ -1,0 +1,28 @@
+{
+	"name": "pavgra/2nova-test",
+	"description": "Test assignment for 2nova",
+	"license": "MIT",
+	"type": "project",
+	"require": {
+		"symfony/http-foundation": "2.7.*",
+		"symfony/form": "2.7.*",
+		"symfony/validator": "2.7.*",
+		"doctrine/orm": "2.6.*",
+		"twig/twig": "1.*",
+		"symfony/routing": "2.7.*",
+		"symfony/yaml": "2.7.*",
+		"symfony/config": "2.7.*",
+		"symfony/twig-bridge": "2.7.*",
+		"symfony/doctrine-bridge": "2.7.*",
+		"symfony/security-csrf": "2.7.*"
+	},
+	"autoload": {
+		"psr-4": {
+			"App\\": "app/"
+		},
+		"files": [
+			"app\\Extensions\\helpers.php"
+		]
+	},
+	"minimum-stability": "dev"
+}

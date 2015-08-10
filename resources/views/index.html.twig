@@ -1,0 +1,30 @@
+{% extends "base.html.twig" %}
+
+{% block content %}
+	<div class="page-index container content">
+		<h4 class="greeting">
+			{% if currentUser is empty %}
+				Hello, Alien. Want to be in list below? - <a href="/register">register</a> and <a href="/login">log in</a>!
+			{% else %}
+				Hello, {{ currentUser.name }}. Thanks for reg!
+			{% endif %}			
+		</h4>
+		<div class="registered-users-wrapper">
+			{% if registeredUsers is empty %}
+				<div class="caption">Nobody registered yet :(</div>	
+			{% else %}
+				<div class="caption">Registered user list:</div>
+				<ul class="collection registered-users">
+					{% for user in registeredUsers %}
+						<li class="collection-item {{ currentUser.id == user.id ? 'active' }}">
+							{{ user.name }} ({{ user.login }})
+							<span class="secondary-content">
+								Registered on {{ user.created_at|date('d M') }} at {{ user.created_at|date('H:i') }}
+							</span>
+						</li>
+					{% endfor %}
+				</ul>
+			{% endif %}
+		</div>
+	</div>
+{% endblock %}

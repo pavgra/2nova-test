@@ -1,0 +1,20 @@
+App\Entity\User:
+    type: entity
+    repositoryClass: App\Entity\UserRepository
+    table: user
+    id:
+        id:
+            type: integer
+            generator:
+                strategy: AUTO
+    fields:
+        login:
+            type: string
+            unique: true
+        password:
+            type: string
+        name:
+            type: string
+        created_at:
+            type: datetime
+            nullable: true
