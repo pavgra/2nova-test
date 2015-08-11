@@ -1,13 +1,12 @@
 <nav>
 	<div class="nav-wrapper container">
 		<a href="/" class="brand-logo">2nova-test</a>
+		<a href="#" data-activates="mobile-nav" class="button-collapse"><i class="fa fa-bars"></i></a>
 		<ul id="nav-mobile" class="right hide-on-med-and-down">
-			{% if currentUser is empty %}
-				<li {% if Page == "register" %} class="active" {% endif %}><a href="/register">Register</a></li>
-				<li {% if Page == "login" %} class="active" {% endif %}><a href="/login">Login</a></li>
-			{% else %}
-				<li><a href="/logout">Log out</a></li>
-			{% endif %}
+			{% include 'blocks/navHrefs.html.twig' %}			
+		</ul>
+		<ul class="side-nav" id="mobile-nav">
+			{% include 'blocks/navHrefs.html.twig' %}
 		</ul>
 	</div>
 </nav>
