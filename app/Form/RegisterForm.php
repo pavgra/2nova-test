@@ -24,7 +24,8 @@ class RegisterForm extends AbstractType
             'required' => true,
             'constraints' => [
                 new Length([
-                    'min' => 4
+                    'min' => 4,
+                    'minMessage' => 'Login is too short. It should have {{ limit }} characters or more.'
                 ])
             ]
         ]);
@@ -34,7 +35,8 @@ class RegisterForm extends AbstractType
             'invalid_message' => 'The password fields must match.',
             'constraints' => [
                 new Length([
-                    'min' => 6
+                    'min' => 6,
+                    'minMessage' => 'Password is too short. It should have {{ limit }} characters or more.'
                 ])
             ],
             'first_options'  => ['label' => 'Password'],
