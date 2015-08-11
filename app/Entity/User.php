@@ -9,6 +9,8 @@ class User
     /** @var string */
     protected $password;
     /** @var string */
+    protected $salt;
+    /** @var string */
     protected $name;
     /** @var \DateTime */
     protected $created_at;
@@ -35,12 +37,19 @@ class User
         return $this->password;
     }
 
-    public static function makePassword($password) {
-        return hash('sha256', $password);
+    private function getSalt() {
+        if (empty($this->salt)) {
+            $this->salt = str_random(32);
+        }
+        return $this->salt;
+    }
+
+    public function makePassword($password = null) {
+        return hash('sha256', ($password ?: $this->password) . $this->getSalt());
     }
 
     public function setPassword($password) {
-        $this->password = static::makePassword($password);
+        $this->password = $this->makePassword($password);
     }
 
     public function getName()
