@@ -1,0 +1,6 @@
+{% if currentUser is empty %}
+	<li {% if Page == "register" %} class="active" {% endif %}><a href="/register">Register</a></li>
+	<li {% if Page == "login" %} class="active" {% endif %}><a href="/login">Login</a></li>
+{% else %}
+	<li><a href="/logout">Log out</a></li>
+{% endif %}
