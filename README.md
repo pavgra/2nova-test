@@ -36,6 +36,13 @@ mkdir storage
 mkdir storage/views
 chmod 777 storage/views
 ```
+
+Also not forget to add
+```
+try_files $uri $uri/ /index.php?$query_string;
+```
+to your website config file in /etc/nginx/sites-available
+
 *Tested with Digital Ocean droplet (with installed LEMP)
 
 ### Result
