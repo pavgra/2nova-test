@@ -115,8 +115,8 @@ class PageController
     }
 
     function logout() {
-        if (!empty($userId = Auth::userId()))
-            Auth::logOut($userId);
+        if (!empty(Auth::userId()))
+            Auth::logOut();
 
         return new RedirectResponse('/');
     }
