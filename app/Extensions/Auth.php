@@ -11,10 +11,10 @@ class Auth
     }
 
     public static function logIn($userId) {
-        return (new Session())->set(static::$userIdField, $userId);
+        (new Session())->set(static::$userIdField, $userId);
     }
 
     public static function logOut() {
-        return (new Session())->remove(static::$userIdField);
+        (new Session())->remove(static::$userIdField);
     }
 }

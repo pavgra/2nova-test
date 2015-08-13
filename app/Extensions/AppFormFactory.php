@@ -5,11 +5,10 @@ use Symfony\Bridge\Twig\Extension\TranslationExtension;
 use Symfony\Bridge\Twig\Form\TwigRenderer;
 use Symfony\Bridge\Twig\Form\TwigRendererEngine;
 use Symfony\Component\Form\Extension\Csrf\CsrfExtension;
-use Symfony\Component\Form\Extension\Csrf\CsrfProvider\SessionCsrfProvider;
 use Symfony\Component\Form\Extension\Validator\ValidatorExtension;
 use Symfony\Component\Form\FormFactoryBuilderInterface;
 use Symfony\Component\Form\Forms;
-use Symfony\Component\HttpFoundation\Session\Session;
+use Symfony\Component\Security\Csrf\CsrfTokenManager;
 use Symfony\Component\Translation\Loader\XliffFileLoader;
 use Symfony\Component\Translation\Translator;
 use Symfony\Component\Validator\Validation;
@@ -54,10 +53,10 @@ class AppFormFactory
 
     private function addExtensions()
     {
-        $csrfProvider = null;
+        $csrfTokenManager = new CsrfTokenManager();
 
         $extensions = [
-            $this->getCsrfExtension($csrfProvider),
+            $this->getCsrfExtension($csrfTokenManager),
             $this->getValidatorExtension()
         ];
 
@@ -65,15 +64,12 @@ class AppFormFactory
             $this->formFactoryBuilder->addExtension($extension);
         }
 
-        $this->extendTwig($csrfProvider);
+        $this->extendTwig($csrfTokenManager);
     }
 
-    private function getCsrfExtension(&$csrfProvider)
+    private function getCsrfExtension($csrfTokenManager)
     {
-        $csrfSecret = 'MDFp86iuAt50XeSCOfgINhOgzm4xPgbS';
-        $session = new Session();
-        $csrfProvider = new SessionCsrfProvider($session, $csrfSecret);
-        return new CsrfExtension($csrfProvider);
+        return new CsrfExtension($csrfTokenManager);
     }
 
     private function getValidatorExtension()
@@ -82,7 +78,7 @@ class AppFormFactory
         return new ValidatorExtension($validator);
     }
 
-    private function extendTwig($csrfProvider)
+    private function extendTwig($csrfTokenManager)
     {
         $translator = new Translator($this->lang);
         $translator->addLoader('xlf', new XliffFileLoader());
@@ -95,13 +91,13 @@ class AppFormFactory
         $twigLoader = $this->twig->getLoader();
         $newTwigLoader = new \Twig_Loader_Chain([
             $twigLoader,
-            new \Twig_Loader_Filesystem([$this->componentDir['twigBridge'] . '/Resources/views/Form',]),
+            new \Twig_Loader_Filesystem([$this->componentDir['twigBridge'] . '/Resources/views/Form']),
         ]);
 
         $this->twig->setLoader($newTwigLoader);
         $formEngine->setEnvironment($this->twig);
         $this->twig->addExtension(new TranslationExtension($translator));
-        $this->twig->addExtension(new FormExtension(new TwigRenderer($formEngine, $csrfProvider)));
+        $this->twig->addExtension(new FormExtension(new TwigRenderer($formEngine, $csrfTokenManager)));
     }
 
 }

@@ -1,6 +1,5 @@
 <?php namespace App\Http;
 
-use App\Extensions\View;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Exception\ResourceNotFoundException;
@@ -13,7 +12,7 @@ class Kernel
 {
     /** @var RouteCollection */
     private $routes;
-    /** @var ControllerResolver */
+    /** @var \App\Extensions\ControllerResolver */
     private $resolver;
 
     public function __construct($resolver)
