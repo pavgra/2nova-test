@@ -23,6 +23,8 @@ class PageController
     protected $request;
     /** @var EntityManager */
     protected $em;
+    /** @var \App\Entity\UserRepository */
+    protected $userRepo;
 
     public function __construct()
     {
@@ -44,14 +46,14 @@ class PageController
         $config->setResultCacheImpl(new ApcCache());
         $conn = config('database');
         $this->em = EntityManager::create($conn, $config);
+
+        $this->userRepo = $this->em->getRepository('App\Entity\User');
     }
 
     function index()
     {
-        $userRepo = $this->em->getRepository('App\Entity\User');
-
-        $currentUser = $userRepo->findOneById(Auth::userId());
-        $registeredUsers = $userRepo->getRegisteredUserList();
+        $currentUser = $this->userRepo->findOneById(Auth::userId());
+        $registeredUsers = $this->userRepo->getRegisteredUserList();
 
         return $this->twig->render('index.html.twig', [
             'currentUser' => $currentUser,
@@ -66,7 +68,7 @@ class PageController
 
         if ($this->request->getMethod() == 'POST' && $form->handleRequest() && $form->isValid()) {
             $loginExists = !empty(
-                $this->em->getRepository(get_class($user))->findOneByLogin($user->getLogin())
+                $this->userRepo->findOneByLogin($user->getLogin())
             );
             if (!$loginExists) {
                 $this->em->persist($user);
@@ -98,7 +100,8 @@ class PageController
 
         if ($this->request->getMethod() == 'POST' && $form->handleRequest() && $form->isValid()) {
             $data = $form->getData();
-            $user = $this->em->getRepository('App\Entity\User')->findOneByLogin($data['login']);
+            $user = $this->userRepo->findOneByLogin($data['login']);
+            /** @var $user \App\Entity\User */
 
             if (empty($user) || $user->makePassword($data['password']) != $user->getPassword()) {
                 $form->get('password')->addError(new FormError('Login or password is incorrect!'));

@@ -3,6 +3,11 @@
 use Doctrine\ORM\EntityRepository;
 use Doctrine\ORM\Query;
 
+/**
+ * @method User findOneById(integer $id)
+ * @method User findOneByLogin(string $login)
+ */
+
 class UserRepository extends EntityRepository
 {
 
