@@ -25,30 +25,36 @@ class User
         return $this->id;
     }
 
-    public function getLogin() {
+    public function getLogin()
+    {
         return $this->login;
     }
 
-    public function setLogin($login) {
+    public function setLogin($login)
+    {
         $this->login = $login;
     }
 
-    public function getPassword() {
+    public function getPassword()
+    {
         return $this->password;
     }
 
-    private function getSalt() {
+    private function getSalt()
+    {
         if (empty($this->salt)) {
             $this->salt = str_random(32);
         }
         return $this->salt;
     }
 
-    public function makePassword($password = null) {
+    public function makePassword($password = null)
+    {
         return hash('sha256', ($password ?: $this->password) . $this->getSalt());
     }
 
-    public function setPassword($password) {
+    public function setPassword($password)
+    {
         $this->password = $this->makePassword($password);
     }
 

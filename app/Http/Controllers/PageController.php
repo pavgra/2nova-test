@@ -1,76 +1,53 @@
-<?php namespace App\Http\Controllers;
+<?php
+namespace App\Http\Controllers;
 
+use App\Entity\User;
+use App\Extensions\Auth;
 use App\Form\LoginForm;
 use App\Form\RegisterForm;
-use App\Entity\User;
-use App\Extensions\AppFormFactory;
-use App\Extensions\Auth;
-use Doctrine\Common\Cache\ApcCache;
 use Symfony\Component\Form\FormError;
-use Symfony\Component\Form\FormFactory;
 use Symfony\Component\HttpFoundation\RedirectResponse;
-use Symfony\Component\HttpFoundation\Request;
-use Doctrine\ORM\EntityManager;
-use Doctrine\ORM\Tools\Setup;
 
-class PageController
+class PageController extends Controller
 {
-    /** @var \Twig_Environment */
-    protected $twig;
-    /** @var FormFactory */
-    protected $formFactory;
-    /** @var Request */
-    protected $request;
-    /** @var EntityManager */
-    protected $em;
     /** @var \App\Entity\UserRepository */
     protected $userRepo;
 
     public function __construct()
     {
-        $isDev = config('app.dev');
-
-        $loader = new \Twig_Loader_Filesystem(config('view.path'));
-        $this->twig = new \Twig_Environment($loader, [
-            'debug' => $isDev,
-            'auto_reload' => $isDev,
-            'cache' => config('view.cache'),
-        ]);
-
-        $this->formFactory = (new AppFormFactory($this->twig))->build();
-
-        $this->request = Request::createFromGlobals();
-
-        $config = Setup::createYAMLMetadataConfiguration([base_path("config/doctrine")], $isDev);
-        $config->setQueryCacheImpl(new ApcCache());
-        $config->setResultCacheImpl(new ApcCache());
-        $conn = config('database');
-        $this->em = EntityManager::create($conn, $config);
-
+        parent::__construct();
         $this->userRepo = $this->em->getRepository('App\Entity\User');
     }
 
-    function index()
+    public function index()
     {
+        // Get current user info
         $currentUser = $this->userRepo->findOneById(Auth::userId());
+        // Get all registered users info
         $registeredUsers = $this->userRepo->getRegisteredUserList();
 
-        return $this->twig->render('index.html.twig', [
-            'currentUser' => $currentUser,
-            'registeredUsers' => $registeredUsers
-        ]);
+        // Render index page with registered users list (highlight current user if authed)
+        return $this->twig->render(
+            'index.html.twig',
+            [
+                'currentUser' => $currentUser,
+                'registeredUsers' => $registeredUsers
+            ]
+        );
     }
 
-    function register()
+    public function register()
     {
+        // Build register form
         $user = new User();
         $form = $this->formFactory->create(new RegisterForm(), $user);
 
+        // On registration attempt (if form was POST-ed and data is valid)
         if ($this->request->getMethod() == 'POST' && $form->handleRequest() && $form->isValid()) {
-            $loginExists = !empty(
-                $this->userRepo->findOneByLogin($user->getLogin())
-            );
-            if (!$loginExists) {
+            // Check whether login is not used
+            $login = $user->getLogin();
+            if (!$this->userRepo->findOneByLogin($login)) {
+                // Create new user
                 $this->em->persist($user);
                 $this->em->flush();
 
@@ -78,48 +55,68 @@ class PageController
                 $cacheDriver = $this->em->getConfiguration()->getResultCacheImpl();
                 $cacheDriver->delete('registered_users_list');
 
+                // Redirect to successful registration page
                 return new RedirectResponse('/afterReg');
             } else {
+                // Display that such login is already used
                 $form->get('login')->addError(new FormError('This login is already used'));
             }
         }
 
-        return $this->twig->render('register.html.twig', [
-            'Page' => 'register',
-            'form' => $form->createView()
-        ]);
+        // Render page with register form
+        return $this->twig->render(
+            'register.html.twig',
+            [
+                'Page' => 'register',
+                'form' => $form->createView()
+            ]
+        );
     }
 
-    function afterReg() {
+    public function afterReg()
+    {
         return $this->twig->render('afterReg.html.twig');
     }
 
-    function login()
+    public function login()
     {
+        // Build login form
         $form = $this->formFactory->create(new LoginForm());
 
+        // On login attempt (if form was POST-ed and data is valid)
         if ($this->request->getMethod() == 'POST' && $form->handleRequest() && $form->isValid()) {
+            // Retrieve POST-ed data
             $data = $form->getData();
-            $user = $this->userRepo->findOneByLogin($data['login']);
+            // Try to find user by given login
             /** @var $user \App\Entity\User */
+            $user = $this->userRepo->findOneByLogin($data['login']);
 
-            if (empty($user) || $user->makePassword($data['password']) != $user->getPassword()) {
+            // If user was not found or password check failed
+            if (!$user || $user->makePassword($data['password']) != $user->getPassword()) {
+                // Display error
                 $form->get('password')->addError(new FormError('Login or password is incorrect!'));
             } else {
+                // Login user and redirect to home page
                 Auth::logIn($user->getId());
                 return new RedirectResponse('/');
             }
         }
 
-        return $this->twig->render('login.html.twig', [
-            'Page' => 'login',
-            'form' => $form->createView()
-        ]);
+        // Render page with login form
+        return $this->twig->render(
+            'login.html.twig',
+            [
+                'Page' => 'login',
+                'form' => $form->createView()
+            ]
+        );
     }
 
-    function logout() {
-        if (!empty(Auth::userId()))
+    public function logout()
+    {
+        if (Auth::userId()) {
             Auth::logOut();
+        }
 
         return new RedirectResponse('/');
     }
