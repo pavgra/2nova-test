@@ -3,9 +3,9 @@
 $loader = require '../vendor/autoload.php';
 $loader->register();
 
-use Symfony\Component\HttpFoundation\Request;
-use App\Http\Kernel;
 use App\Extensions\ControllerResolver;
+use App\Http\Kernel;
+use Symfony\Component\HttpFoundation\Request;
 
 $request = Request::createFromGlobals();
 

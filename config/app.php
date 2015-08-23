@@ -1,5 +1,5 @@
 <?php
 
-	return [
-		'dev' => true,
-	];
+return [
+    'dev' => true,
+];

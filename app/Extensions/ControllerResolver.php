@@ -1,41 +1,62 @@
-<?php namespace App\Extensions;
+<?php
+namespace App\Extensions;
 
-class ControllerResolver {
+use Symfony\Component\HttpFoundation\Request;
 
-	static private $controllersPath = "App\Http\Controllers\\";
+class ControllerResolver
+{
 
-	public function getController($request) {
-		$_controller = $request->attributes['_controller'];
+    private static $controllersPath = "App\Http\Controllers\\";
 
-		if (is_callable($_controller)) {
-			$controller = $_controller; //Closure
-		} else {
-			$_controller = explode('@', $_controller); // Laravel-like controller-method line
+    /**
+     * Returns callback for route
+     * @param Request $request
+     * @return string[]|callable
+     */
+    public function getController($request)
+    {
+        $_controller = $request->attributes['_controller'];
 
-			$class = static::$controllersPath . $_controller[0];
-			$method = isset($_controller[1]) ? $_controller[1] : 'index';
+        if (is_callable($_controller)) {
+            $controller = $_controller; //Closure
+        } else {
+            $_controller = explode('@', $_controller); // Laravel-like controller-method line
 
-			$controller = [new $class(), $method];
-		}
+            $class = static::$controllersPath . $_controller[0];
+            $method = nvl($_controller, 1, 'index');
 
-		return $controller;
-		
-	}
+            $controller = [new $class(), $method];
+        }
 
-	public function getAttributes($request, $controller) {
-		if (is_array($controller)) {
-			$reflection = new \ReflectionMethod($controller[0], $controller[1]);
-		} else {
-			$reflection = new \ReflectionFunction($controller);
-		}
+        return $controller;
 
-		$params = $reflection->getParameters();
-		$attributes = [];
-		
-		foreach ($params as $param) {
-			$attributes[] = nvl($request->attributes, $param->getName(), null);
-		}
+    }
 
-		return $attributes;
-	}
+    /**
+     * Returns attributes for route's callback
+     * @param Request $request
+     * @param string[]|callable $controller
+     * @return array
+     */
+    public function getAttributes($request, $controller)
+    {
+        if (is_array($controller)) {
+            //if controller's class and function names
+            $reflection = new \ReflectionMethod($controller[0], $controller[1]);
+        } else {
+            //if callable
+            $reflection = new \ReflectionFunction($controller);
+        }
+
+        // Get function's params
+        $params = $reflection->getParameters();
+        $attributes = [];
+
+        // Filter required attributes
+        foreach ($params as $param) {
+            $attributes[] = nvl($request->attributes, $param->getName(), null);
+        }
+
+        return $attributes;
+    }
 }

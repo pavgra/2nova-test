@@ -15,7 +15,6 @@ use Symfony\Component\Validator\Validation;
 
 class AppFormFactory
 {
-
     /** @var FormFactoryBuilderInterface */
     private $formFactoryBuilder;
     /** @var string */
@@ -45,6 +44,10 @@ class AppFormFactory
         ];
     }
 
+    /**
+     * Builds FormFactory with extensions required for app
+     * @return \Symfony\Component\Form\FormFactoryInterface
+     */
     public function build()
     {
         $this->addExtensions();
@@ -53,17 +56,21 @@ class AppFormFactory
 
     private function addExtensions()
     {
+        // Create CsrfTokenManager
         $csrfTokenManager = new CsrfTokenManager();
 
+        // List of extensions for app's FormFactory
         $extensions = [
             $this->getCsrfExtension($csrfTokenManager),
             $this->getValidatorExtension()
         ];
 
+        // Load extensions from the list
         foreach ($extensions as $extension) {
             $this->formFactoryBuilder->addExtension($extension);
         }
 
+        // Extend Twig for proper work with FormFactory
         $this->extendTwig($csrfTokenManager);
     }
 
@@ -78,26 +85,48 @@ class AppFormFactory
         return new ValidatorExtension($validator);
     }
 
+    /**
+     * Adds extensions required for proper work with FormFactory to Twig template engine
+     * @param CsrfTokenManager $csrfTokenManager
+     */
     private function extendTwig($csrfTokenManager)
     {
         $translator = new Translator($this->lang);
         $translator->addLoader('xlf', new XliffFileLoader());
-        $translator->addResource('xlf', $this->componentDir['form'] . '/Resources/translations/validators.en.xlf', 'en', 'validators');
-        $translator->addResource('xlf', $this->componentDir['validator'] . '/Resources/translations/validators.en.xlf', 'en', 'validators');
+        $translator->addResource(
+            'xlf',
+            $this->componentDir['form'] . '/Resources/translations/validators.en.xlf',
+            'en',
+            'validators'
+        );
+        $translator->addResource('xlf',
+            $this->componentDir['validator'] . '/Resources/translations/validators.en.xlf',
+            'en',
+            'validators'
+        );
 
         $formTheme = 'bootstrap_3_layout.html.twig';//'form_div_layout.html.twig';
         $formEngine = new TwigRendererEngine([$formTheme]);
 
         $twigLoader = $this->twig->getLoader();
-        $newTwigLoader = new \Twig_Loader_Chain([
-            $twigLoader,
-            new \Twig_Loader_Filesystem([$this->componentDir['twigBridge'] . '/Resources/views/Form']),
-        ]);
+        $newTwigLoader = new \Twig_Loader_Chain(
+            [
+                $twigLoader,
+                new \Twig_Loader_Filesystem([$this->componentDir['twigBridge'] . '/Resources/views/Form']),
+            ]
+        );
 
         $this->twig->setLoader($newTwigLoader);
         $formEngine->setEnvironment($this->twig);
         $this->twig->addExtension(new TranslationExtension($translator));
-        $this->twig->addExtension(new FormExtension(new TwigRenderer($formEngine, $csrfTokenManager)));
+        $this->twig->addExtension(
+            new FormExtension(
+                new TwigRenderer(
+                    $formEngine,
+                    $csrfTokenManager
+                )
+            )
+        );
     }
 
 }

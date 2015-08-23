@@ -1,45 +1,60 @@
-<?php namespace App\Form;
+<?php
+namespace App\Form;
 
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Validator\Constraints\Length;
 
-
 class RegisterForm extends AbstractType
 {
     /**
-     * Builds the LoginForm form
+     * Builds the register form
      * @param  \Symfony\Component\Form\FormBuilderInterface $builder
      * @param  array $options
      * @return void
      */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
-        $builder->add('name', 'text', [
-            'required' => true
-        ]);
-        $builder->add('login', 'text', [
-            'required' => true,
-            'constraints' => [
-                new Length([
-                    'min' => 4,
-                    'minMessage' => 'Login is too short. It should have {{ limit }} characters or more.'
-                ])
+        // Name field
+        $builder->add(
+            'name',
+            'text',
+            [
+                'required' => true
             ]
-        ]);
-        $builder->add('password', 'repeated', [
-            'type' => 'password',
-            'required' => true,
-            'invalid_message' => 'The password fields must match.',
-            'constraints' => [
-                new Length([
-                    'min' => 6,
-                    'minMessage' => 'Password is too short. It should have {{ limit }} characters or more.'
-                ])
-            ],
-            'first_options'  => ['label' => 'Password'],
-            'second_options' => ['label' => 'Repeat Password']
-        ]);
+        );
+        // Login field
+        $builder->add(
+            'login',
+            'text',
+            [
+                'required' => true,
+                'constraints' => [
+                    new Length([
+                        'min' => 4,
+                        'minMessage' => 'Login is too short. It should have {{ limit }} characters or more.'
+                    ])
+                ]
+            ]
+        );
+        // Password and password confirmation fields
+        $builder->add(
+            'password',
+            'repeated',
+            [
+                'type' => 'password',
+                'required' => true,
+                'invalid_message' => 'The password fields must match.',
+                'constraints' => [
+                    new Length([
+                        'min' => 6,
+                        'minMessage' => 'Password is too short. It should have {{ limit }} characters or more.'
+                    ])
+                ],
+                'first_options' => ['label' => 'Password'],
+                'second_options' => ['label' => 'Repeat Password']
+            ]
+        );
     }
 
     /*public function configureOptions(OptionsResolver $resolver)

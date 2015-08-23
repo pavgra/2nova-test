@@ -1,15 +1,13 @@
 <?php
-
 namespace App\Form;
 
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 
-
 class LoginForm extends AbstractType
 {
     /**
-     * Builds the LoginForm form
+     * Builds the login form
      * @param  \Symfony\Component\Form\FormBuilderInterface $builder
      * @param  array $options
      * @return void
